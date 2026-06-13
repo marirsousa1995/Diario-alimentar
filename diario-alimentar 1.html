@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Diário Alimentar</title>
+<style>
+  :root {
+    --sage:       #4E7F6B;
+    --sage-light: #EEF3EF;
+    --sage-mid:   #C5D9D0;
+    --ink:        #1C1C1E;
+    --muted:      #6C6C70;
+    --line:       #D1D5D2;
+    --bg:         #F9FAF9;
+    --white:      #FFFFFF;
+    --red:        #C0392B;
+    --radius:     10px;
+    --font:       -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 90px;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 20px 12px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  header p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* ── Nav ── */
+  #day-nav {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  #day-nav button {
+    flex-shrink: 0; background: none;
+    border: 1px solid var(--line); border-radius: 20px;
+    padding: 5px 12px; font-size: 13px; color: var(--muted);
+    cursor: pointer; white-space: nowrap; font-family: var(--font);
+  }
+  #day-nav button.active {
+    background: var(--sage); border-color: var(--sage);
+    color: var(--white); font-weight: 600;
+  }
+  #btn-new-day {
+    background: var(--sage-light) !important;
+    border-color: var(--sage-light) !important;
+    color: var(--sage) !important; font-weight: 600 !important;
+  }
+
+  /* ── Main ── */
+  main { padding: 16px; max-width: 680px; margin: 0 auto; }
+
+  /* ── Day header card ── */
+  .day-header {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.6px; color: var(--sage); margin-bottom: 12px;
+  }
+  .day-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .day-fields .full { grid-column: 1 / -1; }
+
+  .field-group label {
+    display: block; font-size: 11px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.4px; margin-bottom: 4px;
+  }
+  .field-group input[type=date],
+  .field-group input[type=text],
+  .field-group select {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 10px; font-size: 15px;
+    font-family: var(--font); color: var(--ink);
+    -webkit-appearance: none;
+  }
+  .field-group input:focus,
+  .field-group select:focus { outline: none; border-color: var(--sage); }
+
+  /* ── Sono select ── */
+  .sleep-select { position: relative; }
+  .sleep-select::after {
+    content: '▾'; position: absolute; right: 10px;
+    top: 50%; transform: translateY(-50%);
+    color: var(--muted); pointer-events: none; font-size: 13px;
+  }
+  .sleep-select select { padding-right: 28px; }
+
+  /* ── Meal card ── */
+  .meal-card {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
+  }
+  .meal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--sage-light);
+    border-bottom: 1px solid var(--sage-mid);
+  }
+  .meal-number {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; color: var(--sage);
+  }
+  .btn-remove-meal {
+    background: none; border: none; color: var(--red);
+    font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px;
+  }
+  .meal-body { padding: 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* ── Sliders group ── */
+  .sliders-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .slider-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .slider-hint {
+    font-size: 10px; font-weight: 400; color: var(--sage);
+    text-transform: none; letter-spacing: 0; font-style: italic;
+    display: block; margin-top: 1px;
+  }
+  .slider-wrap label {
+    display: flex; flex-direction: column;
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .slider-row { display: flex; align-items: center; gap: 8px; }
+  .slider-row input[type=range] {
+    flex: 1; -webkit-appearance: none;
+    height: 4px; background: var(--line); border-radius: 2px; outline: none;
+  }
+  .slider-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--sage); cursor: pointer;
+    border: 2px solid var(--white); box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  }
+  .slider-val {
+    font-size: 16px; font-weight: 700; color: var(--sage);
+    width: 22px; text-align: center; flex-shrink: 0;
+  }
+
+  /* ── Textarea ── */
+  textarea {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 8px 10px; font-size: 15px;
+    font-family: var(--font); color: var(--ink);
+    resize: vertical; min-height: 58px;
+  }
+  textarea:focus { outline: none; border-color: var(--sage); }
+  textarea::placeholder { color: var(--muted); }
+
+  /* ── Divider label ── */
+  .divider-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--muted);
+    border-bottom: 1px solid var(--line); padding-bottom: 4px;
+  }
+
+  /* ── Add meal ── */
+  .btn-add-meal {
+    width: 100%; background: var(--white);
+    border: 1.5px dashed var(--sage); border-radius: var(--radius);
+    padding: 14px; font-size: 15px; font-weight: 600; color: var(--sage);
+    cursor: pointer; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: var(--font);
+  }
+  .btn-add-meal:active { background: var(--sage-light); }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--white); border-top: 1px solid var(--line);
+    padding: 10px 16px 16px;
+    display: flex; gap: 10px;
+  }
+  .btn-save {
+    flex: 1; background: var(--sage); color: var(--white);
+    border: none; border-radius: var(--radius); padding: 13px;
+    font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font);
+  }
+  .btn-save:active { opacity: .85; }
+  .btn-pdf {
+    flex: 1; background: var(--white); color: var(--sage);
+    border: 1.5px solid var(--sage); border-radius: var(--radius);
+    padding: 13px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: var(--font);
+  }
+  .btn-pdf:active { background: var(--sage-light); }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 96px; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--ink); color: var(--white);
+    font-size: 14px; padding: 9px 18px; border-radius: 20px;
+    opacity: 0; transition: opacity .2s, transform .2s;
+    pointer-events: none; white-space: nowrap; z-index: 200;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Empty ── */
+  #empty-state {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+  }
+  #empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  #empty-state p { font-size: 15px; line-height: 1.6; }
+
+  /* ══ IMPRESSÃO ══ */
+  @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: white; padding: 0; font-size: 11px; }
+    header, #day-nav, .btn-add-meal, .bottom-bar,
+    #toast, .btn-remove-meal, #empty-state { display: none !important; }
+    main { padding: 0; max-width: 100%; }
+
+    .day-header {
+      background: #e8f0ec !important;
+      border: 1px solid #aaa; border-radius: 0;
+      margin-bottom: 8px; padding: 10px 12px;
+    }
+    .day-fields { grid-template-columns: repeat(4, 1fr); }
+
+    .meal-card {
+      border: 1px solid #bbb; border-radius: 0;
+      margin-bottom: 6px; break-inside: avoid;
+    }
+    .meal-header { background: #ddeae4 !important; padding: 6px 10px; }
+    .meal-body   { padding: 8px 10px; gap: 6px; }
+
+    .sliders-grid { grid-template-columns: repeat(4, 1fr); }
+
+    /* oculta o slider e mostra só o número */
+    .slider-row input[type=range] { display: none !important; }
+    .slider-val { font-size: 14px; }
+
+    .field-group input,
+    .field-group select,
+    textarea {
+      border: none; background: transparent;
+      padding: 2px 0; font-size: 12px;
+    }
+    textarea { min-height: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Diário Alimentar</h1>
+  <p>Método Sophie Deran</p>
+</header>
+
+<div id="day-nav">
+  <button id="btn-new-day">＋ Novo dia</button>
+</div>
+
+<main id="main-content">
+  <div id="empty-state">
+    <div class="icon">🥗</div>
+    <p>Nenhum dia registrado ainda.<br>Toque em <strong>+ Novo dia</strong> para começar.</p>
+  </div>
+</main>
+
+<div class="bottom-bar">
+  <button class="btn-save" id="btn-save">Salvar</button>
+  <button class="btn-pdf"  id="btn-pdf">Exportar PDF</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'diario-alimentar-v2';
+let state = { days: [], activeDayId: null };
+
+function load() {
+  try { const r = localStorage.getItem(STORAGE_KEY); if (r) state = JSON.parse(r); } catch(e){}
+}
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  toast('Salvo ✓');
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function todayISO() { return new Date().toISOString().slice(0,10); }
+function weekdayOf(iso) {
+  if (!iso) return '';
+  const days = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const [y,m,d] = iso.split('-').map(Number);
+  return days[new Date(y, m-1, d).getDay()];
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function activeDay() { return state.days.find(d => d.id === state.activeDayId) || null; }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+/* ── Slider helper ── */
+function sliderHTML(cls, label, val, hint) {
+  return `
+    <div class="slider-wrap">
+      <label>${label}${hint ? `<span class="slider-hint">${hint}</span>` : ''}</label>
+      <div class="slider-row">
+        <input type="range" class="${cls}" min="1" max="10" step="1" value="${val}">
+        <span class="slider-val">${val}</span>
+      </div>
+    </div>`;
+}
+
+/* ── Nav ── */
+function renderNav() {
+  const nav = document.getElementById('day-nav');
+  nav.querySelectorAll('.day-btn').forEach(b => b.remove());
+  [...state.days]
+    .sort((a,b) => a.date.localeCompare(b.date))
+    .forEach(day => {
+      const btn = document.createElement('button');
+      btn.className = 'day-btn' + (day.id === state.activeDayId ? ' active' : '');
+      btn.textContent = fmtDate(day.date);
+      btn.dataset.id = day.id;
+      btn.addEventListener('click', () => {
+        readForm();
+        state.activeDayId = day.id;
+        renderAll();
+      });
+      nav.insertBefore(btn, document.getElementById('btn-new-day'));
+    });
+}
+
+/* ── Lê formulário → state ── */
+function readForm() {
+  const day = activeDay(); if (!day) return;
+  day.date     = document.getElementById('f-date')?.value     || day.date;
+  day.weekday  = weekdayOf(day.date);
+  day.activity = document.getElementById('f-activity')?.value || '';
+  day.sleep    = document.getElementById('f-sleep')?.value    || '';
+  day.meals = [];
+  document.querySelectorAll('.meal-card').forEach(card => {
+    day.meals.push({
+      id:       card.dataset.mealId,
+      time:     card.querySelector('.m-time')?.value    || '',
+      hunger:   card.querySelector('.m-hunger')?.value  || '5',
+      foods:    card.querySelector('.m-foods')?.value   || '',
+      satiety:  card.querySelector('.m-satiety')?.value || '5',
+      satiation:card.querySelector('.m-satiation')?.value|| '5',
+      where:    card.querySelector('.m-where')?.value   || '',
+      satisf:   card.querySelector('.m-satisf')?.value  || '5',
+      notes:    card.querySelector('.m-notes')?.value   || '',
+    });
+  });
+}
+
+function renderAll() { renderNav(); renderDay(); }
+
+/* ── Renderiza dia ── */
+function renderDay() {
+  const main = document.getElementById('main-content');
+  const day  = activeDay();
+  if (!day) {
+    main.innerHTML = `<div id="empty-state"><div class="icon">🥗</div><p>Nenhum dia registrado ainda.<br>Toque em <strong>+ Novo dia</strong> para começar.</p></div>`;
+    return;
+  }
+  main.innerHTML = '';
+
+  /* cabeçalho */
+  const hdr = document.createElement('div');
+  hdr.className = 'day-header';
+  hdr.innerHTML = `
+    <div class="section-label">Informações do dia</div>
+    <div class="day-fields">
+      <div class="field-group">
+        <label>Data</label>
+        <input type="date" id="f-date" value="${day.date}">
+      </div>
+      <div class="field-group">
+        <label>Dia da semana</label>
+        <input type="text" id="f-weekday" value="${day.weekday}" readonly style="color:var(--muted)">
+      </div>
+      <div class="field-group full">
+        <label>Atividade física</label>
+        <input type="text" id="f-activity" placeholder="Ex: caminhada 30 min" value="${day.activity}">
+      </div>
+      <div class="field-group full">
+        <label>Sono</label>
+        <div class="sleep-select">
+          <select id="f-sleep">
+            <option value="">Selecione…</option>
+            <option value="Excelente" ${day.sleep==='Excelente'?'selected':''}>😴 Excelente</option>
+            <option value="Bom"       ${day.sleep==='Bom'      ?'selected':''}>🙂 Bom</option>
+            <option value="Regular"   ${day.sleep==='Regular'  ?'selected':''}>😐 Regular</option>
+            <option value="Ruim"      ${day.sleep==='Ruim'     ?'selected':''}>😣 Ruim</option>
+          </select>
+        </div>
+      </div>
+    </div>`;
+  hdr.querySelector('#f-date').addEventListener('change', e => {
+    hdr.querySelector('#f-weekday').value = weekdayOf(e.target.value);
+  });
+  main.appendChild(hdr);
+
+  /* refeições */
+  day.meals.forEach(meal => main.appendChild(buildMealCard(meal)));
+
+  /* botão add */
+  const btnAdd = document.createElement('button');
+  btnAdd.className = 'btn-add-meal';
+  btnAdd.innerHTML = '＋ Adicionar refeição';
+  btnAdd.addEventListener('click', () => {
+    readForm();
+    activeDay().meals.push({ id:uid(), time:'', hunger:'5', foods:'', satiety:'5', satiation:'5', where:'', satisf:'5', notes:'' });
+    renderDay();
+    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior:'smooth' }), 50);
+  });
+  main.appendChild(btnAdd);
+}
+
+/* ── Card de refeição ── */
+function buildMealCard(meal) {
+  const allCards = document.querySelectorAll('.meal-card').length;
+  const card = document.createElement('div');
+  card.className  = 'meal-card';
+  card.dataset.mealId = meal.id;
+
+  card.innerHTML = `
+    <div class="meal-header">
+      <span class="meal-number">Refeição ${allCards + 1}</span>
+      <button class="btn-remove-meal" title="Remover refeição">×</button>
+    </div>
+    <div class="meal-body">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field-group">
+          <label>Horário</label>
+          <input type="time" class="m-time" value="${meal.time}">
+        </div>
+        <div></div>
+      </div>
+
+      <div class="divider-label">Antes da refeição</div>
+      <div class="sliders-grid" style="grid-template-columns:1fr">
+        ${sliderHTML('m-hunger','Fome (1–10)', meal.hunger)}
+      </div>
+
+      <div class="field-group">
+        <label>Alimentos e quantidade</label>
+        <textarea class="m-foods" rows="3" placeholder="Ex: arroz 4 colheres, frango 100g, salada à vontade">${meal.foods}</textarea>
+      </div>
+
+      <div class="field-group">
+        <label>Onde / Com quem</label>
+        <input type="text" class="m-where" placeholder="Ex: em casa, sozinha" value="${meal.where}">
+      </div>
+
+      <div class="divider-label">Depois da refeição</div>
+      <div class="sliders-grid">
+        ${sliderHTML('m-satiety',  'Saciedade (1–10)',  meal.satiety,  'Sinal que me fez parar de comer')}
+        ${sliderHTML('m-satiation','Saciação (1–10)',   meal.satiation,'Ausência de fome após a refeição')}
+        ${sliderHTML('m-satisf',   'Satisfação (1–10)', meal.satisf,   'Satisfação emocional?')}
+      </div>
+
+      <div class="field-group">
+        <label>Observações</label>
+        <textarea class="m-notes" rows="2" placeholder="Emoções, contexto, vontades…">${meal.notes}</textarea>
+      </div>
+
+    </div>`;
+
+  /* sliders ao vivo */
+  card.querySelectorAll('input[type=range]').forEach(slider => {
+    slider.addEventListener('input', e => {
+      e.target.closest('.slider-row').querySelector('.slider-val').textContent = e.target.value;
+    });
+  });
+
+  /* remover */
+  card.querySelector('.btn-remove-meal').addEventListener('click', () => {
+    readForm();
+    const day = activeDay();
+    day.meals = day.meals.filter(m => m.id !== meal.id);
+    renderDay();
+  });
+
+  return card;
+}
+
+/* ── Novo dia ── */
+document.getElementById('btn-new-day').addEventListener('click', () => {
+  readForm();
+  const iso = todayISO();
+  const d = { id: uid(), date: iso, weekday: weekdayOf(iso), activity:'', sleep:'', meals:[] };
+  state.days.push(d);
+  state.activeDayId = d.id;
+  renderAll();
+});
+
+/* ── Salvar ── */
+document.getElementById('btn-save').addEventListener('click', () => {
+  if (!activeDay()) { toast('Crie um dia primeiro'); return; }
+  readForm(); persist(); renderNav();
+});
+
+/* ── PDF ── */
+document.getElementById('btn-pdf').addEventListener('click', () => {
+  if (!activeDay()) { toast('Nenhum dia para exportar'); return; }
+  readForm(); persist();
+  window.print();
+});
+
+/* ── Init ── */
+load();
+if (state.days.length > 0 && !state.activeDayId)
+  state.activeDayId = state.days[state.days.length - 1].id;
+renderAll();
+</script>
+</body>
+</html>
