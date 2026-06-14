@@ -471,11 +471,14 @@ function buildMealCard(meal) {
         <input type="text" class="m-where" placeholder="Ex: em casa, sozinha" value="${meal.where}">
       </div>
 
+      <div class="divider-label">Durante a refeição</div>
+      <div class="sliders-grid" style="grid-template-columns:1fr">
+        ${sliderHTML('m-satiation','Saciação (1–10)', meal.satiation,'O que me fez parar de comer')}
+      </div>
       <div class="divider-label">Depois da refeição</div>
       <div class="sliders-grid">
-        ${sliderHTML('m-satiety',  'Saciedade (1–10)',  meal.satiety,  'Sinal que me fez parar de comer')}
-        ${sliderHTML('m-satiation','Saciação (1–10)',   meal.satiation,'Ausência de fome após a refeição')}
-        ${sliderHTML('m-satisf',   'Satisfação (1–10)', meal.satisf,   'Satisfação emocional?')}
+        ${sliderHTML('m-satiety','Saciedade (1–10)', meal.satiety,'Ausência de fome após a refeição')}
+        ${sliderHTML('m-satisf', 'Satisfação (1–10)', meal.satisf, 'Satisfação emocional?')}
       </div>
 
       <div class="field-group">
