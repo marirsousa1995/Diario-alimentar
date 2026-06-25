@@ -69,9 +69,19 @@
     background: var(--white); border: 1px solid var(--line);
     border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
   }
+  .day-header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
   .section-label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.6px; color: var(--sage); margin-bottom: 12px;
+    letter-spacing: 0.6px; color: var(--sage);
+  }
+  .btn-delete-day {
+    background: none; border: none; color: var(--red);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: var(--font); padding: 4px 8px;
+    border: 1px solid var(--red); border-radius: 6px;
   }
   .day-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .day-fields .full { grid-column: 1 / -1; }
@@ -93,7 +103,6 @@
   .field-group input:focus,
   .field-group select:focus { outline: none; border-color: var(--sage); }
 
-  /* ── Sono select ── */
   .sleep-select { position: relative; }
   .sleep-select::after {
     content: '▾'; position: absolute; right: 10px;
@@ -122,20 +131,17 @@
   }
   .meal-body { padding: 14px 14px; display: flex; flex-direction: column; gap: 12px; }
 
-  /* ── Sliders group ── */
-  .sliders-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-  }
+  .sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .slider-wrap { display: flex; flex-direction: column; gap: 5px; }
+  .slider-wrap label {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    display: flex; flex-direction: column;
+  }
   .slider-hint {
     font-size: 10px; font-weight: 400; color: var(--sage);
     text-transform: none; letter-spacing: 0; font-style: italic;
     display: block; margin-top: 1px;
-  }
-  .slider-wrap label {
-    display: flex; flex-direction: column;
-    font-size: 11px; font-weight: 600; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.4px;
   }
   .slider-row { display: flex; align-items: center; gap: 8px; }
   .slider-row input[type=range] {
@@ -152,7 +158,6 @@
     width: 22px; text-align: center; flex-shrink: 0;
   }
 
-  /* ── Textarea ── */
   textarea {
     width: 100%; background: var(--bg);
     border: 1px solid var(--line); border-radius: 6px;
@@ -163,14 +168,12 @@
   textarea:focus { outline: none; border-color: var(--sage); }
   textarea::placeholder { color: var(--muted); }
 
-  /* ── Divider label ── */
   .divider-label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.5px; color: var(--muted);
     border-bottom: 1px solid var(--line); padding-bottom: 4px;
   }
 
-  /* ── Add meal ── */
   .btn-add-meal {
     width: 100%; background: var(--white);
     border: 1.5px dashed var(--sage); border-radius: var(--radius);
@@ -181,26 +184,81 @@
   }
   .btn-add-meal:active { background: var(--sage-light); }
 
-  /* ── Bottom bar ── */
+  /* ── Bottom bar (3 botões) ── */
   .bottom-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--white); border-top: 1px solid var(--line);
     padding: 10px 16px 16px;
-    display: flex; gap: 10px;
+    display: flex; gap: 8px;
   }
   .btn-save {
     flex: 1; background: var(--sage); color: var(--white);
     border: none; border-radius: var(--radius); padding: 13px;
-    font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font);
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font);
   }
   .btn-save:active { opacity: .85; }
   .btn-pdf {
     flex: 1; background: var(--white); color: var(--sage);
     border: 1.5px solid var(--sage); border-radius: var(--radius);
-    padding: 13px; font-size: 15px; font-weight: 600;
+    padding: 13px; font-size: 14px; font-weight: 600;
     cursor: pointer; font-family: var(--font);
   }
   .btn-pdf:active { background: var(--sage-light); }
+  .btn-pdf-all {
+    flex: 1; background: var(--white); color: var(--sage);
+    border: 1.5px solid var(--sage); border-radius: var(--radius);
+    padding: 13px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: var(--font);
+  }
+  .btn-pdf-all:active { background: var(--sage-light); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 300; display: flex; align-items: flex-end;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: var(--white); width: 100%;
+    border-radius: 18px 18px 0 0; padding: 24px 20px 32px;
+    max-width: 680px; margin: 0 auto;
+  }
+  .modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal-box p  { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-cancel {
+    flex: 1; background: var(--bg); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 13px; font-size: 15px;
+    font-weight: 600; cursor: pointer; font-family: var(--font); color: var(--ink);
+  }
+  .modal-confirm {
+    flex: 1; background: var(--red); border: none;
+    border-radius: var(--radius); padding: 13px; font-size: 15px;
+    font-weight: 600; cursor: pointer; font-family: var(--font); color: var(--white);
+  }
+
+  /* ── Modal seleção PDF ── */
+  .pdf-day-list {
+    max-height: 260px; overflow-y: auto;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+  .pdf-day-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .pdf-day-item:last-child { border-bottom: none; }
+  .pdf-day-item input[type=checkbox] {
+    width: 18px; height: 18px; accent-color: var(--sage); flex-shrink: 0;
+  }
+  .pdf-day-item label { font-size: 15px; cursor: pointer; }
+  .pdf-select-btns { display: flex; gap: 8px; margin-bottom: 12px; }
+  .pdf-select-btns button {
+    font-size: 12px; font-weight: 600; color: var(--sage);
+    background: none; border: 1px solid var(--sage-mid);
+    border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font);
+  }
 
   /* ── Toast ── */
   #toast {
@@ -214,9 +272,7 @@
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* ── Empty ── */
-  #empty-state {
-    text-align: center; padding: 60px 20px; color: var(--muted);
-  }
+  #empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
   #empty-state .icon { font-size: 48px; margin-bottom: 12px; }
   #empty-state p { font-size: 15px; line-height: 1.6; }
 
@@ -225,8 +281,13 @@
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     body { background: white; padding: 0; font-size: 11px; }
     header, #day-nav, .btn-add-meal, .bottom-bar,
-    #toast, .btn-remove-meal, #empty-state { display: none !important; }
+    #toast, .btn-remove-meal, .btn-delete-day,
+    #empty-state, .modal-overlay { display: none !important; }
     main { padding: 0; max-width: 100%; }
+
+    /* separador entre dias no PDF completo */
+    .print-day-block { page-break-after: always; }
+    .print-day-block:last-child { page-break-after: avoid; }
 
     .day-header {
       background: #e8f0ec !important;
@@ -234,25 +295,17 @@
       margin-bottom: 8px; padding: 10px 12px;
     }
     .day-fields { grid-template-columns: repeat(4, 1fr); }
-
     .meal-card {
       border: 1px solid #bbb; border-radius: 0;
       margin-bottom: 6px; break-inside: avoid;
     }
     .meal-header { background: #ddeae4 !important; padding: 6px 10px; }
     .meal-body   { padding: 8px 10px; gap: 6px; }
-
     .sliders-grid { grid-template-columns: repeat(4, 1fr); }
-
-    /* oculta o slider e mostra só o número */
     .slider-row input[type=range] { display: none !important; }
     .slider-val { font-size: 14px; }
-
-    .field-group input,
-    .field-group select,
-    textarea {
-      border: none; background: transparent;
-      padding: 2px 0; font-size: 12px;
+    .field-group input, .field-group select, textarea {
+      border: none; background: transparent; padding: 2px 0; font-size: 12px;
     }
     textarea { min-height: 0; }
   }
@@ -277,8 +330,38 @@
 </main>
 
 <div class="bottom-bar">
-  <button class="btn-save" id="btn-save">Salvar</button>
-  <button class="btn-pdf"  id="btn-pdf">Exportar PDF</button>
+  <button class="btn-save"    id="btn-save">Salvar</button>
+  <button class="btn-pdf"     id="btn-pdf">PDF do dia</button>
+  <button class="btn-pdf-all" id="btn-pdf-all">PDF geral</button>
+</div>
+
+<!-- Modal: confirmar apagar dia -->
+<div class="modal-overlay hidden" id="modal-delete">
+  <div class="modal-box">
+    <h3>Apagar este dia?</h3>
+    <p id="modal-delete-msg">Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="modal-cancel"  id="modal-delete-cancel">Cancelar</button>
+      <button class="modal-confirm" id="modal-delete-confirm">Apagar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: selecionar dias para PDF geral -->
+<div class="modal-overlay hidden" id="modal-pdf">
+  <div class="modal-box">
+    <h3>Selecionar dias para o PDF</h3>
+    <div class="pdf-select-btns">
+      <button id="pdf-select-all">Todos</button>
+      <button id="pdf-select-15">Últimos 15 dias</button>
+      <button id="pdf-select-none">Nenhum</button>
+    </div>
+    <div class="pdf-day-list" id="pdf-day-list"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel"  id="modal-pdf-cancel">Cancelar</button>
+      <button class="modal-confirm" id="modal-pdf-confirm">Gerar PDF</button>
+    </div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -315,7 +398,6 @@ function toast(msg) {
   setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-/* ── Slider helper ── */
 function sliderHTML(cls, label, val, hint) {
   return `
     <div class="slider-wrap">
@@ -357,15 +439,15 @@ function readForm() {
   day.meals = [];
   document.querySelectorAll('.meal-card').forEach(card => {
     day.meals.push({
-      id:       card.dataset.mealId,
-      time:     card.querySelector('.m-time')?.value    || '',
-      hunger:   card.querySelector('.m-hunger')?.value  || '5',
-      foods:    card.querySelector('.m-foods')?.value   || '',
-      satiety:  card.querySelector('.m-satiety')?.value || '5',
-      satiation:card.querySelector('.m-satiation')?.value|| '5',
-      where:    card.querySelector('.m-where')?.value   || '',
-      satisf:   card.querySelector('.m-satisf')?.value  || '5',
-      notes:    card.querySelector('.m-notes')?.value   || '',
+      id:        card.dataset.mealId,
+      time:      card.querySelector('.m-time')?.value     || '',
+      hunger:    card.querySelector('.m-hunger')?.value   || '5',
+      foods:     card.querySelector('.m-foods')?.value    || '',
+      satiation: card.querySelector('.m-satiation')?.value|| '5',
+      satiety:   card.querySelector('.m-satiety')?.value  || '5',
+      satisf:    card.querySelector('.m-satisf')?.value   || '5',
+      where:     card.querySelector('.m-where')?.value    || '',
+      notes:     card.querySelector('.m-notes')?.value    || '',
     });
   });
 }
@@ -382,11 +464,13 @@ function renderDay() {
   }
   main.innerHTML = '';
 
-  /* cabeçalho */
   const hdr = document.createElement('div');
   hdr.className = 'day-header';
   hdr.innerHTML = `
-    <div class="section-label">Informações do dia</div>
+    <div class="day-header-top">
+      <span class="section-label">Informações do dia</span>
+      <button class="btn-delete-day" id="btn-delete-day">🗑 Apagar dia</button>
+    </div>
     <div class="day-fields">
       <div class="field-group">
         <label>Data</label>
@@ -416,18 +500,19 @@ function renderDay() {
   hdr.querySelector('#f-date').addEventListener('change', e => {
     hdr.querySelector('#f-weekday').value = weekdayOf(e.target.value);
   });
+  hdr.querySelector('#btn-delete-day').addEventListener('click', () => {
+    openDeleteModal(day);
+  });
   main.appendChild(hdr);
 
-  /* refeições */
   day.meals.forEach(meal => main.appendChild(buildMealCard(meal)));
 
-  /* botão add */
   const btnAdd = document.createElement('button');
   btnAdd.className = 'btn-add-meal';
   btnAdd.innerHTML = '＋ Adicionar refeição';
   btnAdd.addEventListener('click', () => {
     readForm();
-    activeDay().meals.push({ id:uid(), time:'', hunger:'5', foods:'', satiety:'5', satiation:'5', where:'', satisf:'5', notes:'' });
+    activeDay().meals.push({ id:uid(), time:'', hunger:'5', foods:'', satiation:'5', satiety:'5', satisf:'5', where:'', notes:'' });
     renderDay();
     setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior:'smooth' }), 50);
   });
@@ -438,16 +523,14 @@ function renderDay() {
 function buildMealCard(meal) {
   const allCards = document.querySelectorAll('.meal-card').length;
   const card = document.createElement('div');
-  card.className  = 'meal-card';
+  card.className = 'meal-card';
   card.dataset.mealId = meal.id;
-
   card.innerHTML = `
     <div class="meal-header">
       <span class="meal-number">Refeição ${allCards + 1}</span>
       <button class="btn-remove-meal" title="Remover refeição">×</button>
     </div>
     <div class="meal-body">
-
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div class="field-group">
           <label>Horário</label>
@@ -455,22 +538,18 @@ function buildMealCard(meal) {
         </div>
         <div></div>
       </div>
-
       <div class="divider-label">Antes da refeição</div>
       <div class="sliders-grid" style="grid-template-columns:1fr">
         ${sliderHTML('m-hunger','Fome (1–10)', meal.hunger)}
       </div>
-
       <div class="field-group">
         <label>Alimentos e quantidade</label>
         <textarea class="m-foods" rows="3" placeholder="Ex: arroz 4 colheres, frango 100g, salada à vontade">${meal.foods}</textarea>
       </div>
-
       <div class="field-group">
         <label>Onde / Com quem</label>
         <input type="text" class="m-where" placeholder="Ex: em casa, sozinha" value="${meal.where}">
       </div>
-
       <div class="divider-label">Durante a refeição</div>
       <div class="sliders-grid" style="grid-template-columns:1fr">
         ${sliderHTML('m-satiation','Saciação (1–10)', meal.satiation,'O que me fez parar de comer')}
@@ -480,31 +559,153 @@ function buildMealCard(meal) {
         ${sliderHTML('m-satiety','Saciedade (1–10)', meal.satiety,'Ausência de fome após a refeição')}
         ${sliderHTML('m-satisf', 'Satisfação (1–10)', meal.satisf, 'Satisfação emocional?')}
       </div>
-
       <div class="field-group">
         <label>Observações</label>
         <textarea class="m-notes" rows="2" placeholder="Emoções, contexto, vontades…">${meal.notes}</textarea>
       </div>
-
     </div>`;
 
-  /* sliders ao vivo */
   card.querySelectorAll('input[type=range]').forEach(slider => {
     slider.addEventListener('input', e => {
       e.target.closest('.slider-row').querySelector('.slider-val').textContent = e.target.value;
     });
   });
-
-  /* remover */
   card.querySelector('.btn-remove-meal').addEventListener('click', () => {
     readForm();
-    const day = activeDay();
-    day.meals = day.meals.filter(m => m.id !== meal.id);
+    activeDay().meals = activeDay().meals.filter(m => m.id !== meal.id);
     renderDay();
   });
-
   return card;
 }
+
+/* ── Renderiza um dia completo para impressão ── */
+function renderDayForPrint(day) {
+  const wrap = document.createElement('div');
+  wrap.className = 'print-day-block';
+
+  // cabeçalho
+  const hdr = document.createElement('div');
+  hdr.className = 'day-header';
+  hdr.innerHTML = `
+    <div class="section-label" style="margin-bottom:8px">
+      ${fmtDate(day.date)} — ${day.weekday}
+    </div>
+    <div class="day-fields">
+      <div class="field-group"><label>Atividade física</label>
+        <input type="text" value="${day.activity}" readonly></div>
+      <div class="field-group"><label>Sono</label>
+        <input type="text" value="${day.sleep}" readonly></div>
+    </div>`;
+  wrap.appendChild(hdr);
+
+  day.meals.forEach((meal, i) => {
+    const card = document.createElement('div');
+    card.className = 'meal-card';
+    card.innerHTML = `
+      <div class="meal-header"><span class="meal-number">Refeição ${i+1} — ${meal.time}</span></div>
+      <div class="meal-body">
+        <div class="sliders-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="slider-wrap"><label>Fome<br><span class="slider-val">${meal.hunger}</span></label></div>
+          <div class="slider-wrap"><label>Saciação<br><span class="slider-val">${meal.satiation}</span></label></div>
+          <div class="slider-wrap"><label>Saciedade<br><span class="slider-val">${meal.satiety}</span></label></div>
+          <div class="slider-wrap"><label>Satisfação<br><span class="slider-val">${meal.satisf}</span></label></div>
+        </div>
+        <div class="field-group"><label>Alimentos e quantidade</label>
+          <textarea readonly rows="2">${meal.foods}</textarea></div>
+        <div class="field-group"><label>Onde / Com quem</label>
+          <input type="text" value="${meal.where}" readonly></div>
+        <div class="field-group"><label>Observações</label>
+          <textarea readonly rows="2">${meal.notes}</textarea></div>
+      </div>`;
+    wrap.appendChild(card);
+  });
+  return wrap;
+}
+
+/* ── Modal: apagar dia ── */
+function openDeleteModal(day) {
+  document.getElementById('modal-delete-msg').textContent =
+    `Apagar ${fmtDate(day.date)} (${day.weekday})? Esta ação não pode ser desfeita.`;
+  document.getElementById('modal-delete').classList.remove('hidden');
+  document.getElementById('modal-delete-confirm').onclick = () => {
+    state.days = state.days.filter(d => d.id !== day.id);
+    state.activeDayId = state.days.length > 0 ? state.days[state.days.length-1].id : null;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    document.getElementById('modal-delete').classList.add('hidden');
+    toast('Dia apagado');
+    renderAll();
+  };
+}
+document.getElementById('modal-delete-cancel').addEventListener('click', () => {
+  document.getElementById('modal-delete').classList.add('hidden');
+});
+document.getElementById('modal-delete').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-delete'))
+    document.getElementById('modal-delete').classList.add('hidden');
+});
+
+/* ── Modal: PDF geral ── */
+document.getElementById('btn-pdf-all').addEventListener('click', () => {
+  if (state.days.length === 0) { toast('Nenhum dia registrado'); return; }
+  readForm();
+
+  const sorted = [...state.days].sort((a,b) => a.date.localeCompare(b.date));
+  const list   = document.getElementById('pdf-day-list');
+  list.innerHTML = '';
+  sorted.forEach(day => {
+    const item = document.createElement('div');
+    item.className = 'pdf-day-item';
+    item.innerHTML = `
+      <input type="checkbox" id="chk-${day.id}" data-id="${day.id}" checked>
+      <label for="chk-${day.id}">${fmtDate(day.date)} — ${day.weekday}</label>`;
+    list.appendChild(item);
+  });
+  document.getElementById('modal-pdf').classList.remove('hidden');
+});
+
+document.getElementById('pdf-select-all').addEventListener('click', () => {
+  document.querySelectorAll('#pdf-day-list input[type=checkbox]').forEach(c => c.checked = true);
+});
+document.getElementById('pdf-select-none').addEventListener('click', () => {
+  document.querySelectorAll('#pdf-day-list input[type=checkbox]').forEach(c => c.checked = false);
+});
+document.getElementById('pdf-select-15').addEventListener('click', () => {
+  const checks = [...document.querySelectorAll('#pdf-day-list input[type=checkbox]')];
+  checks.forEach(c => c.checked = false);
+  checks.slice(-15).forEach(c => c.checked = true);
+});
+
+document.getElementById('modal-pdf-cancel').addEventListener('click', () => {
+  document.getElementById('modal-pdf').classList.add('hidden');
+});
+document.getElementById('modal-pdf').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-pdf'))
+    document.getElementById('modal-pdf').classList.add('hidden');
+});
+
+document.getElementById('modal-pdf-confirm').addEventListener('click', () => {
+  const selectedIds = [...document.querySelectorAll('#pdf-day-list input[type=checkbox]:checked')]
+    .map(c => c.dataset.id);
+  if (selectedIds.length === 0) { toast('Selecione ao menos um dia'); return; }
+
+  const selectedDays = state.days
+    .filter(d => selectedIds.includes(d.id))
+    .sort((a,b) => a.date.localeCompare(b.date));
+
+  // monta área de impressão temporária
+  const main = document.getElementById('main-content');
+  const backup = main.innerHTML;
+  main.innerHTML = '';
+  selectedDays.forEach(day => main.appendChild(renderDayForPrint(day)));
+
+  document.getElementById('modal-pdf').classList.add('hidden');
+
+  setTimeout(() => {
+    window.print();
+    // restaura após impressão
+    setTimeout(() => { main.innerHTML = backup; renderDay(); }, 500);
+  }, 200);
+});
 
 /* ── Novo dia ── */
 document.getElementById('btn-new-day').addEventListener('click', () => {
@@ -522,7 +723,7 @@ document.getElementById('btn-save').addEventListener('click', () => {
   readForm(); persist(); renderNav();
 });
 
-/* ── PDF ── */
+/* ── PDF do dia ── */
 document.getElementById('btn-pdf').addEventListener('click', () => {
   if (!activeDay()) { toast('Nenhum dia para exportar'); return; }
   readForm(); persist();
