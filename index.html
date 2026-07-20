@@ -260,6 +260,14 @@
     border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font);
   }
 
+  .btn-delete-bulk {
+    flex: 0 0 auto; background: var(--white); color: var(--red);
+    border: 1.5px solid var(--red); border-radius: var(--radius);
+    padding: 13px 14px; font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: var(--font);
+  }
+  .btn-delete-bulk:active { background: #fdf0ef; }
+
   /* ── Toast ── */
   #toast {
     position: fixed; bottom: 96px; left: 50%;
@@ -333,6 +341,7 @@
   <button class="btn-save"    id="btn-save">Salvar</button>
   <button class="btn-pdf"     id="btn-pdf">PDF do dia</button>
   <button class="btn-pdf-all" id="btn-pdf-all">PDF geral</button>
+  <button class="btn-delete-bulk" id="btn-delete-bulk">🗑 Lote</button>
 </div>
 
 <!-- Modal: confirmar apagar dia -->
@@ -360,6 +369,23 @@
     <div class="modal-actions">
       <button class="modal-cancel"  id="modal-pdf-cancel">Cancelar</button>
       <button class="modal-confirm" id="modal-pdf-confirm">Gerar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: apagar em lote -->
+<div class="modal-overlay hidden" id="modal-bulk-delete">
+  <div class="modal-box">
+    <h3>Apagar dias</h3>
+    <div class="pdf-select-btns">
+      <button id="bulk-select-all">Todos</button>
+      <button id="bulk-select-none">Nenhum</button>
+    </div>
+    <div class="pdf-day-list" id="bulk-day-list"></div>
+    <p style="font-size:13px;color:var(--red);margin-top:12px">⚠️ Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="modal-cancel"  id="modal-bulk-cancel">Cancelar</button>
+      <button class="modal-confirm" id="modal-bulk-confirm">Apagar selecionados</button>
     </div>
   </div>
 </div>
@@ -414,7 +440,7 @@ function renderNav() {
   const nav = document.getElementById('day-nav');
   nav.querySelectorAll('.day-btn').forEach(b => b.remove());
   [...state.days]
-    .sort((a,b) => a.date.localeCompare(b.date))
+    .sort((a,b) => b.date.localeCompare(a.date))
     .forEach(day => {
       const btn = document.createElement('button');
       btn.className = 'day-btn' + (day.id === state.activeDayId ? ' active' : '');
@@ -670,9 +696,11 @@ document.getElementById('pdf-select-none').addEventListener('click', () => {
   document.querySelectorAll('#pdf-day-list input[type=checkbox]').forEach(c => c.checked = false);
 });
 document.getElementById('pdf-select-15').addEventListener('click', () => {
+  // pega as datas únicas ordenadas e seleciona as 15 mais recentes por data real
   const checks = [...document.querySelectorAll('#pdf-day-list input[type=checkbox]')];
-  checks.forEach(c => c.checked = false);
-  checks.slice(-15).forEach(c => c.checked = true);
+  const sorted = [...state.days].sort((a,b) => b.date.localeCompare(a.date));
+  const last15ids = new Set(sorted.slice(0,15).map(d => d.id));
+  checks.forEach(c => { c.checked = last15ids.has(c.dataset.id); });
 });
 
 document.getElementById('modal-pdf-cancel').addEventListener('click', () => {
@@ -705,6 +733,51 @@ document.getElementById('modal-pdf-confirm').addEventListener('click', () => {
     // restaura após impressão
     setTimeout(() => { main.innerHTML = backup; renderDay(); }, 500);
   }, 200);
+});
+
+/* ── Modal: apagar em lote ── */
+document.getElementById('btn-delete-bulk').addEventListener('click', () => {
+  if (state.days.length === 0) { toast('Nenhum dia registrado'); return; }
+  readForm();
+  const sorted = [...state.days].sort((a,b) => b.date.localeCompare(a.date));
+  const list = document.getElementById('bulk-day-list');
+  list.innerHTML = '';
+  sorted.forEach(day => {
+    const item = document.createElement('div');
+    item.className = 'pdf-day-item';
+    item.innerHTML = `
+      <input type="checkbox" id="bchk-${day.id}" data-id="${day.id}">
+      <label for="bchk-${day.id}">${fmtDate(day.date)} — ${day.weekday}</label>`;
+    list.appendChild(item);
+  });
+  document.getElementById('modal-bulk-delete').classList.remove('hidden');
+});
+document.getElementById('bulk-select-all').addEventListener('click', () => {
+  document.querySelectorAll('#bulk-day-list input[type=checkbox]').forEach(c => c.checked = true);
+});
+document.getElementById('bulk-select-none').addEventListener('click', () => {
+  document.querySelectorAll('#bulk-day-list input[type=checkbox]').forEach(c => c.checked = false);
+});
+document.getElementById('modal-bulk-cancel').addEventListener('click', () => {
+  document.getElementById('modal-bulk-delete').classList.add('hidden');
+});
+document.getElementById('modal-bulk-delete').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-bulk-delete'))
+    document.getElementById('modal-bulk-delete').classList.add('hidden');
+});
+document.getElementById('modal-bulk-confirm').addEventListener('click', () => {
+  const toDelete = new Set(
+    [...document.querySelectorAll('#bulk-day-list input[type=checkbox]:checked')]
+      .map(c => c.dataset.id)
+  );
+  if (toDelete.size === 0) { toast('Selecione ao menos um dia'); return; }
+  state.days = state.days.filter(d => !toDelete.has(d.id));
+  if (!state.days.find(d => d.id === state.activeDayId))
+    state.activeDayId = state.days.length > 0 ? state.days[0].id : null;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  document.getElementById('modal-bulk-delete').classList.add('hidden');
+  toast(`${toDelete.size} dia(s) apagado(s)`);
+  renderAll();
 });
 
 /* ── Novo dia ── */
