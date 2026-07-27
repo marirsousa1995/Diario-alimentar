@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Diário Alimentar">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Diário Alimentar</title>
 <style>
   :root {
@@ -26,8 +30,6 @@
     min-height: 100vh;
     padding-bottom: 90px;
   }
-
-  /* ── Header ── */
   header {
     background: var(--white);
     border-bottom: 1px solid var(--line);
@@ -36,14 +38,13 @@
   }
   header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
   header p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
-
-  /* ── Nav ── */
   #day-nav {
     display: flex; align-items: center; gap: 8px;
     padding: 10px 16px;
     background: var(--white);
     border-bottom: 1px solid var(--line);
     overflow-x: auto; -webkit-overflow-scrolling: touch;
+    position: relative;
   }
   #day-nav button {
     flex-shrink: 0; background: none;
@@ -56,15 +57,14 @@
     color: var(--white); font-weight: 600;
   }
   #btn-new-day {
+    position: sticky;
+    left: 0;
+    z-index: 2;
     background: var(--sage-light) !important;
     border-color: var(--sage-light) !important;
     color: var(--sage) !important; font-weight: 600 !important;
   }
-
-  /* ── Main ── */
   main { padding: 16px; max-width: 680px; margin: 0 auto; }
-
-  /* ── Day header card ── */
   .day-header {
     background: var(--white); border: 1px solid var(--line);
     border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
@@ -85,7 +85,6 @@
   }
   .day-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .day-fields .full { grid-column: 1 / -1; }
-
   .field-group label {
     display: block; font-size: 11px; font-weight: 600;
     color: var(--muted); text-transform: uppercase;
@@ -102,7 +101,6 @@
   }
   .field-group input:focus,
   .field-group select:focus { outline: none; border-color: var(--sage); }
-
   .sleep-select { position: relative; }
   .sleep-select::after {
     content: '▾'; position: absolute; right: 10px;
@@ -110,8 +108,6 @@
     color: var(--muted); pointer-events: none; font-size: 13px;
   }
   .sleep-select select { padding-right: 28px; }
-
-  /* ── Meal card ── */
   .meal-card {
     background: var(--white); border: 1px solid var(--line);
     border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
@@ -130,7 +126,6 @@
     font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px;
   }
   .meal-body { padding: 14px 14px; display: flex; flex-direction: column; gap: 12px; }
-
   .sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .slider-wrap { display: flex; flex-direction: column; gap: 5px; }
   .slider-wrap label {
@@ -157,7 +152,6 @@
     font-size: 16px; font-weight: 700; color: var(--sage);
     width: 22px; text-align: center; flex-shrink: 0;
   }
-
   textarea {
     width: 100%; background: var(--bg);
     border: 1px solid var(--line); border-radius: 6px;
@@ -167,13 +161,11 @@
   }
   textarea:focus { outline: none; border-color: var(--sage); }
   textarea::placeholder { color: var(--muted); }
-
   .divider-label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.5px; color: var(--muted);
     border-bottom: 1px solid var(--line); padding-bottom: 4px;
   }
-
   .btn-add-meal {
     width: 100%; background: var(--white);
     border: 1.5px dashed var(--sage); border-radius: var(--radius);
@@ -183,8 +175,6 @@
     font-family: var(--font);
   }
   .btn-add-meal:active { background: var(--sage-light); }
-
-  /* ── Bottom bar (3 botões) ── */
   .bottom-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--white); border-top: 1px solid var(--line);
@@ -194,25 +184,48 @@
   .btn-save {
     flex: 1; background: var(--sage); color: var(--white);
     border: none; border-radius: var(--radius); padding: 13px;
-    font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font);
+    font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font);
   }
   .btn-save:active { opacity: .85; }
-  .btn-pdf {
-    flex: 1; background: var(--white); color: var(--sage);
-    border: 1.5px solid var(--sage); border-radius: var(--radius);
-    padding: 13px; font-size: 14px; font-weight: 600;
+  .btn-menu {
+    flex: 0 0 auto; background: var(--white); color: var(--ink);
+    border: 1.5px solid var(--line); border-radius: var(--radius);
+    padding: 13px 18px; font-size: 20px; line-height: 1;
     cursor: pointer; font-family: var(--font);
   }
-  .btn-pdf:active { background: var(--sage-light); }
-  .btn-pdf-all {
-    flex: 1; background: var(--white); color: var(--sage);
-    border: 1.5px solid var(--sage); border-radius: var(--radius);
-    padding: 13px; font-size: 14px; font-weight: 600;
-    cursor: pointer; font-family: var(--font);
+  .btn-menu:active { background: var(--bg); }
+  .menu-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.35);
+    z-index: 400; display: flex; align-items: flex-end;
   }
-  .btn-pdf-all:active { background: var(--sage-light); }
-
-  /* ── Modal ── */
+  .menu-overlay.hidden { display: none; }
+  .menu-box {
+    background: var(--white); width: 100%;
+    border-radius: 18px 18px 0 0; padding: 12px 0 32px;
+    max-width: 680px; margin: 0 auto;
+  }
+  .menu-handle {
+    width: 36px; height: 4px; background: var(--line);
+    border-radius: 2px; margin: 0 auto 16px;
+  }
+  .menu-title {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 0 20px 8px;
+  }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 15px 20px; cursor: pointer;
+    border: none; background: none; width: 100%;
+    font-family: var(--font); font-size: 16px; color: var(--ink);
+    text-align: left;
+  }
+  .menu-item:active { background: var(--bg); }
+  .menu-item .menu-icon { font-size: 20px; width: 28px; text-align: center; }
+  .menu-item.danger { color: var(--red); }
+  .menu-separator {
+    height: 1px; background: var(--line); margin: 4px 20px;
+  }
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.45);
     z-index: 300; display: flex; align-items: flex-end;
@@ -236,8 +249,6 @@
     border-radius: var(--radius); padding: 13px; font-size: 15px;
     font-weight: 600; cursor: pointer; font-family: var(--font); color: var(--white);
   }
-
-  /* ── Modal seleção PDF ── */
   .pdf-day-list {
     max-height: 260px; overflow-y: auto;
     border: 1px solid var(--line); border-radius: var(--radius);
@@ -259,16 +270,6 @@
     background: none; border: 1px solid var(--sage-mid);
     border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: var(--font);
   }
-
-  .btn-delete-bulk {
-    flex: 0 0 auto; background: var(--white); color: var(--red);
-    border: 1.5px solid var(--red); border-radius: var(--radius);
-    padding: 13px 14px; font-size: 14px; font-weight: 600;
-    cursor: pointer; font-family: var(--font);
-  }
-  .btn-delete-bulk:active { background: #fdf0ef; }
-
-  /* ── Toast ── */
   #toast {
     position: fixed; bottom: 96px; left: 50%;
     transform: translateX(-50%) translateY(10px);
@@ -278,13 +279,9 @@
     pointer-events: none; white-space: nowrap; z-index: 200;
   }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── Empty ── */
   #empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
   #empty-state .icon { font-size: 48px; margin-bottom: 12px; }
   #empty-state p { font-size: 15px; line-height: 1.6; }
-
-  /* ══ IMPRESSÃO ══ */
   @media print {
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     body { background: white; padding: 0; font-size: 11px; }
@@ -292,11 +289,8 @@
     #toast, .btn-remove-meal, .btn-delete-day,
     #empty-state, .modal-overlay { display: none !important; }
     main { padding: 0; max-width: 100%; }
-
-    /* separador entre dias no PDF completo */
     .print-day-block { page-break-after: always; }
     .print-day-block:last-child { page-break-after: avoid; }
-
     .day-header {
       background: #e8f0ec !important;
       border: 1px solid #aaa; border-radius: 0;
@@ -338,13 +332,35 @@
 </main>
 
 <div class="bottom-bar">
-  <button class="btn-save"    id="btn-save">Salvar</button>
-  <button class="btn-pdf"     id="btn-pdf">PDF do dia</button>
-  <button class="btn-pdf-all" id="btn-pdf-all">PDF geral</button>
-  <button class="btn-delete-bulk" id="btn-delete-bulk">🗑 Lote</button>
+  <button class="btn-save" id="btn-save">Salvar</button>
+  <button class="btn-menu" id="btn-menu">⋯</button>
 </div>
 
-<!-- Modal: confirmar apagar dia -->
+<div class="menu-overlay hidden" id="menu-overlay">
+  <div class="menu-box">
+    <div class="menu-handle"></div>
+    <div class="menu-title">Opções</div>
+    <button class="menu-item" id="menu-pdf-day">
+      <span class="menu-icon">📄</span> PDF do dia atual
+    </button>
+    <button class="menu-item" id="menu-pdf-all">
+      <span class="menu-icon">📋</span> PDF geral (vários dias)
+    </button>
+    <div class="menu-separator"></div>
+    <button class="menu-item" id="menu-export-json">
+      <span class="menu-icon">💾</span> Exportar histórico (JSON)
+    </button>
+    <button class="menu-item" id="menu-import-json">
+      <span class="menu-icon">📥</span> Importar histórico (JSON)
+    </button>
+    <input type="file" id="import-file-input" accept=".json" style="display:none">
+    <div class="menu-separator"></div>
+    <button class="menu-item danger" id="menu-bulk-delete">
+      <span class="menu-icon">🗑</span> Apagar dias em lote
+    </button>
+  </div>
+</div>
+
 <div class="modal-overlay hidden" id="modal-delete">
   <div class="modal-box">
     <h3>Apagar este dia?</h3>
@@ -356,7 +372,6 @@
   </div>
 </div>
 
-<!-- Modal: selecionar dias para PDF geral -->
 <div class="modal-overlay hidden" id="modal-pdf">
   <div class="modal-box">
     <h3>Selecionar dias para o PDF</h3>
@@ -373,7 +388,6 @@
   </div>
 </div>
 
-<!-- Modal: apagar em lote -->
 <div class="modal-overlay hidden" id="modal-bulk-delete">
   <div class="modal-box">
     <h3>Apagar dias</h3>
@@ -435,10 +449,11 @@ function sliderHTML(cls, label, val, hint) {
     </div>`;
 }
 
-/* ── Nav ── */
 function renderNav() {
   const nav = document.getElementById('day-nav');
+  const btnNewDay = document.getElementById('btn-new-day');
   nav.querySelectorAll('.day-btn').forEach(b => b.remove());
+  let anchor = btnNewDay;
   [...state.days]
     .sort((a,b) => b.date.localeCompare(a.date))
     .forEach(day => {
@@ -451,11 +466,11 @@ function renderNav() {
         state.activeDayId = day.id;
         renderAll();
       });
-      nav.insertBefore(btn, document.getElementById('btn-new-day'));
+      nav.insertBefore(btn, anchor.nextSibling);
+      anchor = btn;
     });
 }
 
-/* ── Lê formulário → state ── */
 function readForm() {
   const day = activeDay(); if (!day) return;
   day.date     = document.getElementById('f-date')?.value     || day.date;
@@ -480,7 +495,6 @@ function readForm() {
 
 function renderAll() { renderNav(); renderDay(); }
 
-/* ── Renderiza dia ── */
 function renderDay() {
   const main = document.getElementById('main-content');
   const day  = activeDay();
@@ -545,7 +559,6 @@ function renderDay() {
   main.appendChild(btnAdd);
 }
 
-/* ── Card de refeição ── */
 function buildMealCard(meal) {
   const allCards = document.querySelectorAll('.meal-card').length;
   const card = document.createElement('div');
@@ -604,12 +617,10 @@ function buildMealCard(meal) {
   return card;
 }
 
-/* ── Renderiza um dia completo para impressão ── */
 function renderDayForPrint(day) {
   const wrap = document.createElement('div');
   wrap.className = 'print-day-block';
 
-  // cabeçalho
   const hdr = document.createElement('div');
   hdr.className = 'day-header';
   hdr.innerHTML = `
@@ -648,7 +659,6 @@ function renderDayForPrint(day) {
   return wrap;
 }
 
-/* ── Modal: apagar dia ── */
 function openDeleteModal(day) {
   document.getElementById('modal-delete-msg').textContent =
     `Apagar ${fmtDate(day.date)} (${day.weekday})? Esta ação não pode ser desfeita.`;
@@ -670,8 +680,7 @@ document.getElementById('modal-delete').addEventListener('click', e => {
     document.getElementById('modal-delete').classList.add('hidden');
 });
 
-/* ── Modal: PDF geral ── */
-document.getElementById('btn-pdf-all').addEventListener('click', () => {
+function openPdfAllModal() {
   if (state.days.length === 0) { toast('Nenhum dia registrado'); return; }
   readForm();
 
@@ -687,7 +696,7 @@ document.getElementById('btn-pdf-all').addEventListener('click', () => {
     list.appendChild(item);
   });
   document.getElementById('modal-pdf').classList.remove('hidden');
-});
+}
 
 document.getElementById('pdf-select-all').addEventListener('click', () => {
   document.querySelectorAll('#pdf-day-list input[type=checkbox]').forEach(c => c.checked = true);
@@ -696,7 +705,6 @@ document.getElementById('pdf-select-none').addEventListener('click', () => {
   document.querySelectorAll('#pdf-day-list input[type=checkbox]').forEach(c => c.checked = false);
 });
 document.getElementById('pdf-select-15').addEventListener('click', () => {
-  // pega as datas únicas ordenadas e seleciona as 15 mais recentes por data real
   const checks = [...document.querySelectorAll('#pdf-day-list input[type=checkbox]')];
   const sorted = [...state.days].sort((a,b) => b.date.localeCompare(a.date));
   const last15ids = new Set(sorted.slice(0,15).map(d => d.id));
@@ -720,7 +728,6 @@ document.getElementById('modal-pdf-confirm').addEventListener('click', () => {
     .filter(d => selectedIds.includes(d.id))
     .sort((a,b) => a.date.localeCompare(b.date));
 
-  // monta área de impressão temporária
   const main = document.getElementById('main-content');
   const backup = main.innerHTML;
   main.innerHTML = '';
@@ -730,13 +737,11 @@ document.getElementById('modal-pdf-confirm').addEventListener('click', () => {
 
   setTimeout(() => {
     window.print();
-    // restaura após impressão
     setTimeout(() => { main.innerHTML = backup; renderDay(); }, 500);
   }, 200);
 });
 
-/* ── Modal: apagar em lote ── */
-document.getElementById('btn-delete-bulk').addEventListener('click', () => {
+function openBulkDeleteModal() {
   if (state.days.length === 0) { toast('Nenhum dia registrado'); return; }
   readForm();
   const sorted = [...state.days].sort((a,b) => b.date.localeCompare(a.date));
@@ -751,7 +756,7 @@ document.getElementById('btn-delete-bulk').addEventListener('click', () => {
     list.appendChild(item);
   });
   document.getElementById('modal-bulk-delete').classList.remove('hidden');
-});
+}
 document.getElementById('bulk-select-all').addEventListener('click', () => {
   document.querySelectorAll('#bulk-day-list input[type=checkbox]').forEach(c => c.checked = true);
 });
@@ -780,7 +785,6 @@ document.getElementById('modal-bulk-confirm').addEventListener('click', () => {
   renderAll();
 });
 
-/* ── Novo dia ── */
 document.getElementById('btn-new-day').addEventListener('click', () => {
   readForm();
   const iso = todayISO();
@@ -790,20 +794,84 @@ document.getElementById('btn-new-day').addEventListener('click', () => {
   renderAll();
 });
 
-/* ── Salvar ── */
 document.getElementById('btn-save').addEventListener('click', () => {
   if (!activeDay()) { toast('Crie um dia primeiro'); return; }
   readForm(); persist(); renderNav();
 });
 
-/* ── PDF do dia ── */
-document.getElementById('btn-pdf').addEventListener('click', () => {
+function exportPdfDay() {
   if (!activeDay()) { toast('Nenhum dia para exportar'); return; }
   readForm(); persist();
   window.print();
+}
+
+const menuOverlay = document.getElementById('menu-overlay');
+document.getElementById('btn-menu').addEventListener('click', () => {
+  menuOverlay.classList.remove('hidden');
+});
+menuOverlay.addEventListener('click', e => {
+  if (e.target === menuOverlay) menuOverlay.classList.add('hidden');
+});
+function closeMenu() { menuOverlay.classList.add('hidden'); }
+
+document.getElementById('menu-pdf-day').addEventListener('click', () => {
+  closeMenu(); exportPdfDay();
+});
+document.getElementById('menu-pdf-all').addEventListener('click', () => {
+  closeMenu(); openPdfAllModal();
+});
+document.getElementById('menu-bulk-delete').addEventListener('click', () => {
+  closeMenu(); openBulkDeleteModal();
 });
 
-/* ── Init ── */
+document.getElementById('menu-export-json').addEventListener('click', () => {
+  closeMenu();
+  readForm();
+  const json = JSON.stringify(state, null, 2);
+  navigator.clipboard.writeText(json).then(() => {
+    toast('Histórico copiado! Cole num bloco de notas e salve como .json');
+  }).catch(() => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;padding:20px';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:14px;padding:20px;width:100%">
+        <p style="font-size:13px;color:#6C6C70;margin-bottom:8px">Selecione tudo e copie:</p>
+        <textarea readonly rows="8" style="width:100%;font-size:11px;border:1px solid #ddd;border-radius:6px;padding:8px;font-family:monospace">${json}</textarea>
+        <button onclick="this.closest('div').parentElement.remove()" style="margin-top:12px;width:100%;padding:12px;background:#4E7F6B;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600">Fechar</button>
+      </div>`;
+    document.body.appendChild(overlay);
+  });
+});
+
+document.getElementById('menu-import-json').addEventListener('click', () => {
+  closeMenu();
+  document.getElementById('import-file-input').click();
+});
+document.getElementById('import-file-input').addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.days) throw new Error('Formato inválido');
+      const existingIds = new Set(state.days.map(d => d.id));
+      let added = 0;
+      imported.days.forEach(d => {
+        if (!existingIds.has(d.id)) { state.days.push(d); added++; }
+      });
+      if (!state.activeDayId && state.days.length > 0)
+        state.activeDayId = state.days[0].id;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      toast(`${added} dia(s) importado(s) ✓`);
+      renderAll();
+    } catch(err) {
+      toast('Arquivo inválido ✗');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
 load();
 if (state.days.length > 0 && !state.activeDayId)
   state.activeDayId = state.days[state.days.length - 1].id;
